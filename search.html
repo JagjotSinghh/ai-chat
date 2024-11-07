@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollama Search</title>
+</head>
+<body>
+    <form id="searchForm">
+        <input type="text" id="searchQuery" placeholder="Enter your search...">
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="results"></div>
+
+    <script>
+        document.getElementById("searchForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const query = document.getElementById("searchQuery").value;
+
+            // Send search query to Ollama API
+            const response = await fetch("http://127.0.0.1:11434/api/generate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ query: query }) // Adjust based on the API requirements
+            });
+
+            const data = await response.json();
+
+            // Display the results
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = JSON.stringify(data, null, 2); // You can format this for better display
+        });
+    </script>
+</body>
+</html>

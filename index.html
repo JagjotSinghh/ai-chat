@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeChat</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            margin: 0;
+            padding: 0;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background-color: #d1f5d3;
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .message.bot {
+            background-color: #e1e1e1;
+            align-self: flex-start;
+        }
+
+        .input-container {
+            display: flex;
+        }
+
+        textarea {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <script>
+        async function sendMessage(event) {
+            event.preventDefault();
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) return;
+
+            // Add user's message on the right
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.innerText = prompt;
+            document.querySelector('.messages').appendChild(userMessage);
+
+            // Clear input
+            document.getElementById('prompt').value = '';
+
+            // Call API to get response
+            try {
+                const response = await fetch('http://localhost:5000/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                // Add AI response on the left
+                const botMessage = document.createElement('div');
+                botMessage.className = 'message bot';
+                botMessage.innerText = result.response || result.message;
+                document.querySelector('.messages').appendChild(botMessage);
+            } catch (error) {
+                console.error('Error:', error);
+                const botMessage = document.createElement('div');
+                botMessage.className = 'message bot';
+                botMessage.innerText = 'Error occurred while generating response.';
+                document.querySelector('.messages').appendChild(botMessage);
+            }
+
+            // Scroll to the bottom
+            document.querySelector('.messages').scrollTop = document.querySelector('.messages').scrollHeight;
+        }
+    </script>
+</head>
+<body>
+    <div class="chat-container">
+        <h1 style="color: #f4f4f4;">VibeChat</h1>
+
+        <div class="messages">
+            <!-- Chat messages will appear here -->
+        </div>
+
+        <form class="input-container" onsubmit="sendMessage(event)">
+            <textarea id="prompt" rows="2" placeholder="Type your prompt..."></textarea>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+</body>
+</html>
