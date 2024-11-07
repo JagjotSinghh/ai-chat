@@ -17,7 +17,7 @@ def generate():
         "Content-Type": "application/json"
     }
     data = {
-        "model": "gemma2:latest",  # Change to your model
+        "model": "llama3.1:latest",  # Change to your model
         "prompt": user_prompt,
         "stream": False
     }
